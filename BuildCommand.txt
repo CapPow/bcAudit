@@ -1,0 +1,1 @@
+pyinstaller --onefile --add-binary C:\Users\JohnSmith\AppData\Local\Programs\Python\Python36\Lib\site-packages\pyzbar\*.dll;pyzbar bcAudit.py
