@@ -27,8 +27,8 @@
 
 -No extensive timing / user rate tests have been performed. 
 
--Initial timing tests show an intel core 2 can keep up with >= 4 images / minute, provided the barcodes are applied within 12+- degrees of 90degree increments. 
+-Initial timing tests show an intel core 2 can keep up with >= 4 images / minute.
 
--Very misaligned barcodes slow down the program as it attempts various rotations.
+-Very misaligned barcodes slow down the program as it attempts various rotations. The closer to a no read zone, the longer it will take.
 
--No read zones at approximately +-10 degrees of: 135, 225, 315 and 45 degrees with respect to barcode angle. (why do you have 45 degree barcodes???)
+-No read zones at approximately +-10 degrees of: 45, 135, 225, 315 and  degrees with respect to barcode angle. _``why do you have 45 degree barcodes?``_
