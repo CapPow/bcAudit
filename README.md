@@ -5,9 +5,11 @@
 
 -This is a test project, Use at your own risk!
 
--Initially compiled into single .exe windows files using pyinstaller.
+-Initially distributed as a single .exe window file using pyinstaller.
 
--If you're going to compile a copy, there is an issue with pyinstaller compileing on windows 10 and running on windows 7. Easiest solution I found was just to compile on windows 7, for windows 7. This is untested in any other OS.
+-If you're going to compile a copy, there is an issue with pyinstaller compiling on windows 10 and running on windows 7. Easiest solution I found was just to compile on windows 7, for windows 7. This is untested in any other OS.
+
+-My build commands are added for convenience, the paths will need to be updated for your environment.
 
 -The existing single exe build has the collection's regex code hardcoded into it.
 
