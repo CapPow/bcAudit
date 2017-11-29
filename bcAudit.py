@@ -12,8 +12,11 @@ import winsound
 
 inputImgFile = ''
 barCodeType = 'CODE128'
+collRegEx = ('^(APSC\d{7})\D*')
 #collRegEx = ('^(TENN-V-\d{7})\D*')
-collRegEx = ('^(UCHT\d{6})\D*')
+#collRegEx = ('^(UCHT\d{6})\D*')
+#collRegEx = ('/^(HTTU\d{6})\D*')
+#collRegEx = ('/^(ETSU\d{6})\D*')
 inputFileType = '.jpg'
 rawFileExt = '.CR2'
 beepFrequency = 2000
@@ -71,8 +74,10 @@ def checkPattern(inputImgFile,bcData, img):
 
 def handleResult(inputImgFile,bcValue, img):
     try:
-        oldRawName = inputImgFile.split('.')[0] + rawFileExt
-        newRawName = bcValue + rawFileExt
+        oldRawName = inputImgFile.rsplit('.',1)[0] + rawFileExt
+        inputBaseName = os.path.basename(inputImgFile)
+        newRawBaseName = bcValue + rawFileExt
+        newRawName = inputImgFile.replace(inputBaseName, newRawBaseName)
         if oldRawName != newRawName:
             try:
                 os.rename(oldRawName, newRawName)                
@@ -88,6 +93,6 @@ def handleResult(inputImgFile,bcValue, img):
         winsound.Beep(beepFrequency + 200, beepDuration)
         print(e)
     os.remove(inputImgFile)            
-    
+     
 if __name__ == '__main__':
     main()
