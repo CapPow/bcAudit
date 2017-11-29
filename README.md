@@ -5,6 +5,8 @@
 
 -This is a test project, Use at your own risk!
 
+-Written in Python 3.6
+
 -Initially distributed as a single .exe window file using pyinstaller.
 
 -If you're going to compile a copy, there is an issue with pyinstaller compiling on windows 10 and running on windows 7. Easiest solution I found was just to compile on windows 7, for windows 7. This is untested in any other OS.
