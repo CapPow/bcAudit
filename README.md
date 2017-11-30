@@ -13,7 +13,7 @@
 
 -My build commands are added for convenience, the paths will need to be updated for your environment.
 
--The existing single exe build has the collection's regex code hardcoded into it.
+-The existing stand alone exe build has Multiple Tennessee Collection's expected barcodes hardcoded as Regex patterns.
 
 -Presumes .CR2 and .JPG files are being generated from the camera.
 
@@ -21,7 +21,7 @@
 
 -Using a Cannon EOS utility's linked software option link .jpg outputs to this program.
 
--This program loads the jpg, seeks a barcode and if it matches the collection regex and the file name is mismatched it renames it
+-This program loads the jpg, seeks a barcode and matching a collection regex and ensures the matching .CR2 file is appropriately named.
 
 -Then the program removes the jpg (always).
 
@@ -33,4 +33,4 @@
 
 -Very misaligned barcodes slow down the program as it attempts various rotations. The closer to a no read zone, the longer it will take.
 
--No read zones at approximately +-10 degrees of: 45, 135, 225, 315 and  degrees with respect to barcode angle. _``why do you have 45 degree barcodes?``_
+-No read zones at approximately +-10 degrees of: 45, 135, 225, and 315 degrees with respect to barcode angle. _``why do you have 45 degree barcodes?``_
