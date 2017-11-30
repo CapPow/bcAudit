@@ -3,7 +3,7 @@
 
 ### Thanks to [Natural History Museum](https://github.com/NaturalHistoryMuseum) for their work on [pyzbar](https://github.com/NaturalHistoryMuseum/pyzbar)!
 
-####-This is a test project, Use at your own risk!
+#### This is a test project, Use at your own risk!
 
 ### Quick Setup
 
