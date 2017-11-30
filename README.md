@@ -3,9 +3,33 @@
 
 ### Thanks to [Natural History Museum](https://github.com/NaturalHistoryMuseum) for their work on [pyzbar](https://github.com/NaturalHistoryMuseum/pyzbar)!
 
--This is a test project, Use at your own risk!
+####-This is a test project, Use at your own risk!
+
+### Quick Setup
+
+-The inclued exe file (and therefore "Quick Setup") will only work if your collection code is included in the distribution.
+
+-Currently supported: UCHT, TENN, APSC, HTTU, ETSU, MTSU, SWMT, UTM, UOS
+
+-Download the bcAudit.exe and place it in a convienent location.
+
+-Open EOS Cannon remote shooting software and navigate to: preferences > Linked Software
+
+-Use the checkbox to select only .jpg files and then browse to the bcAudit.exe location to link the software.
+
+-Your EOS software should now open bcAudit and and provide it with a .jpg file when one is created.
+
+-Set the EoS Software to output a .jpg along with the usual .CR2 file. 
+
+-You'll have many options for .jpg quality, the "Raw + M"  ouputs a medium quality .jpg with the .CR2 option.
+
+-.jpg files will be destroyed after the program analyzes them! If your workflow requires both files to exist, modifications will be necessary.
+
+### Technical details:
 
 -Written in Python 3.6
+
+-This program loads a jpg provided as an argument. Then seeks a barcode in that image. If the code matches a list of expected collection regex patters,the name of the .CR2 file is verified and, if necessary changed.
 
 -Initially distributed as a single .exe window file using pyinstaller.
 
@@ -13,15 +37,9 @@
 
 -My build commands are added for convenience, the paths will need to be updated for your environment.
 
--The existing stand alone exe build has Multiple Tennessee Collection's expected barcodes hardcoded as Regex patterns.
-
 -Presumes .CR2 and .JPG files are being generated from the camera.
 
 -Presumes the .JPG files are not useful after analysis and removes them! This is easily altered if building your own.
-
--Using a Cannon EOS utility's linked software option link .jpg outputs to this program.
-
--This program loads the jpg, seeks a barcode and matching a collection regex and ensures the matching .CR2 file is appropriately named.
 
 -Then the program removes the jpg (always).
 
