@@ -4,7 +4,6 @@ import sys
 import re
 from PIL import Image
 import pyzbar
-#from pyzbar.pyzbar import *
 from pyzbar.pyzbar import decode
 from pyzbar.pyzbar import ZBarSymbol
 import winsound
@@ -20,7 +19,8 @@ collectionPatterns = [('^(UCHT\d{6})\D*'),
                     ('^(MTSU\d{6})\D*'),
                     ('^(SWMT\d{5})\D*'),
                     ('^(UTM\d{5})\D*'),
-                    ('^(UOS\d{5})\D*')]
+                    ('^(UOS\d{5})\D*'),
+                    ('^(MEM\d{6})\D*')]
 inputFileType = '.jpg'
 rawFileExt = '.CR2'
 beepFrequency = 2000
@@ -64,8 +64,10 @@ def checkPattern(inputImgFile,bcData, img):
         if rePattern.match(bcValue):
             handleResult(inputImgFile,bcValue,img)
             return
-#Incase there are multiple BCs, flip the image, and rescan for BC from other end.
+
+#In case there are multiple BCs, flip the image, and rescan for BC from other end.
 #Then essentially restart the function. (Probably a nicer way to do this)
+
     img2 = img.rotate((180),resample=Image.NEAREST,expand = True)
     bcData = decode(img2)
     bcValue = str(bcData[0].data).split("'")[1].rstrip("'")
