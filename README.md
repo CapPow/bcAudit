@@ -27,6 +27,8 @@
 
 -.jpg files will be destroyed after the program analyzes them! If your workflow requires both files to exist, modifications will be necessary.
 
+-This has only been tested in a Windows 7 environment, I'd love to know if it functions in other versions of Windows.
+
 ### Technical details:
 
 -Written in Python 3.6
