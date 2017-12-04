@@ -21,7 +21,7 @@
 
 -Set the EoS Software to output a .jpg along with the usual .CR2 file. 
 
--You'll have many options for .jpg quality, the "Raw + M"  ouputs a medium quality .jpg with the .CR2 option.
+-You'll have many options for .jpg quality, the "Raw + L" option has given me the best results. This ouputs a large .jpg with the .CR2 option. If your operators are outpacing the camera's ability to transfer images to the computer you can attempt to reduce the .jpg quality but you may find the barcodes are recognized less frequently.
 
 -.jpg files will be destroyed after the program analyzes them! If your workflow requires both files to exist, modifications will be necessary.
 
