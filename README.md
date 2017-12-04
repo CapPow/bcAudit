@@ -35,6 +35,10 @@
 
 -This program loads a jpg provided as an argument. Then seeks a barcode in that image. If the code matches a list of expected collection regex patters,the name of the .CR2 file is verified and, if necessary changed.
 
+-If the patterns match, name corrections are made silently.
+
+-If there is an error finding or reading the barcode (multi-sheet specimen) or an error finding the files then the program attempts to initiate a classic "Beep" to warn the user of an error.
+
 -Initially distributed as a single .exe window file using pyinstaller.
 
 -If you're going to compile a copy, there is an issue with pyinstaller compiling on windows 10 and running on windows 7. Easiest solution I found was just to compile on windows 7, for windows 7. This is untested in any other OS.
@@ -47,11 +51,9 @@
 
 -Then the program removes the jpg (always).
 
--If there is an error finding the barcode (multi-sheet specimen) or the files the program attempts to use the computer's internal "beep" speaker.
-
 -No extensive timing / user rate tests have been performed. 
 
--Initial timing tests show an intel core 2 can keep up with >= 4 images / minute.
+-Initial timing tests show an intel core 2 can keep up with <= 4 images / minute.
 
 -Very misaligned barcodes slow down the program as it attempts various rotations. The closer to a no read zone, the longer it will take.
 
