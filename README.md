@@ -9,7 +9,7 @@
 
 -The inclued exe file (and therefore "Quick Setup") will only work if your collection code is included in the distribution.
 
--Currently supported: UCHT, TENN, APSC, HTTU, ETSU, MTSU, SWMT, UTM, UOS
+-Currently supported: UCHT, TENN, APSC, HTTU, ETSU, MTSU, SWMT, UTM, UOS, MEM
 
 -Download the bcAudit.exe and place it in a convienent location.
 
