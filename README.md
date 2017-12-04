@@ -11,6 +11,8 @@
 
 -Currently supported: UCHT, TENN, APSC, HTTU, ETSU, MTSU, SWMT, UTM, UOS, MEM
 
+-IF you want to test this with a seperate collection (or list of collections) but don't/can't compile it yourself feel free to contact me.
+
 -Download the bcAudit.exe and place it in a convienent location.
 
 -Open EOS Cannon remote shooting software and navigate to: preferences > Linked Software
