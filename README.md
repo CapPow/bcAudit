@@ -11,7 +11,7 @@
 
 -Currently supported: UCHT, TENN, APSC, HTTU, ETSU, MTSU, SWMT, UTM, UOS, MEM
 
--IF you want to test this with a separate collection (or list of collections) but cannot compile it yourself feel free to contact me.
+-If you want to test this with a separate collection (or list of collections) but cannot compile it yourself feel free to contact me.
 
 -Download the bcAudit.exe and place it in a convienent location.
 
@@ -19,7 +19,7 @@
 
 -Use the checkbox to select only .jpg files and then browse to the bcAudit.exe location to link the software.
 
--Your EOS software should now open bcAudit and and provide it with a .jpg file when one is created.
+-Your EOS software should now open bcAudit and provide it with a .jpg file when one is created.
 
 -Set the EoS Software to output a .jpg along with the usual .CR2 file. 
 
@@ -48,10 +48,6 @@
 -Presumes .CR2 and .JPG files are being generated from the camera.
 
 -Presumes the .JPG files are not useful after analysis and removes them! This is easily altered if building your own.
-
--Then the program removes the jpg (always).
-
--No extensive timing / user rate tests have been performed. 
 
 -Initial timing tests show an intel core 2 can keep up with <= 4 images / minute.
 
