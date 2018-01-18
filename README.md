@@ -11,7 +11,7 @@
 
 -Currently supported: UCHT, TENN, APSC, HTTU, ETSU, MTSU, SWMT, UTM, UOS, MEM
 
--IF you want to test this with a seperate collection (or list of collections) but cannot compile it yourself feel free to contact me.
+-IF you want to test this with a separate collection (or list of collections) but cannot compile it yourself feel free to contact me.
 
 -Download the bcAudit.exe and place it in a convienent location.
 
