@@ -20,7 +20,9 @@ collectionPatterns = [('^(UCHT\d{6})\D*'),
                     ('^(SWMT\d{5})\D*'),
                     ('^(UTM\d{5})\D*'),
                     ('^(UOS\d{5})\D*'),
-                    ('^(MEM\d{6})\D*')]
+                    ('^(MEM\d{6})\D*'),
+                    ('^(GSMNP\d{6})\D*')]
+
 inputFileType = '.jpg'
 rawFileExt = '.CR2'
 beepFrequency = 2000
