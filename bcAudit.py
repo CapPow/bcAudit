@@ -3,25 +3,29 @@ import argparse
 import sys
 import re
 from PIL import Image
-import pyzbar
 from pyzbar.pyzbar import decode
-from pyzbar.pyzbar import ZBarSymbol
 
 inputImgFile = ''
 barCodeType = 'CODE128'
-collectionPatterns = [('^(UCHT\d{6})\D*'),
-                    ('^(TENN-V-\d{7})\D*'),
-                    ('^(APSC\d{7})\D*'),
-                    ('^(HTTU\d{6})\D*'),
-                    ('^(ETSU\d{6})\D*'),
-                    ('^(MTSU\d{6})\D*'),
-                    ('^(SWMT\d{5})\D*'),
-                    ('^(UTM\d{5})\D*'),
-                    ('^(UOS\d{5})\D*'),
-                    ('^(MEM\d{6})\D*'),
-                    ('^(GSMNP\d{6})\D*')]
 
-inputFileType = '.jpg'
+# read the collection code pattern(s)
+with open('collection_code_patterns.txt', 'r') as file: 
+    lines = file.read().split('\n')
+    collectionPatterns = [x for x in lines if not any([x.strip().startswith('#'), x == ''])]
+    #comment_less = filter(None, (line.split('#')[0].strip() for line in lines))    
+
+#collectionPatterns = [(r'^(UCHT\d{6})\D*'),
+#                      (r'^(TENN-V-\d{7})\D*'),
+#                      (r'^(APSC\d{7})\D*'),
+#                      (r'^(HTTU\d{6})\D*'),
+#                      (r'^(ETSU\d{6})\D*'),
+#                      (r'^(MTSU\d{6})\D*'),
+#                      (r'^(SWMT\d{5})\D*'),
+#                      (r'^(UTM\d{5})\D*'),
+#                      (r'^(UOS\d{5})\D*'),
+#                      (r'^(MEM\d{6})\D*'),
+#                      (r'^(GSMNP\d{6})\D*')]
+
 rawFileExt = '.CR2'
 # do you want to remove the .jpg file when this is all done?
 # some workflows want both jpg and raw files.
@@ -47,48 +51,92 @@ def main(args=None):
         args = parser.parse_args(args)
 
     inputImgFile = args.image[0]
-    img = Image.open(inputImgFile)
-    bcData = decode(img)
-    if len(bcData) != 0:
-        checkPattern(inputImgFile, bcData, img)
-    # if it failed to read a file name, then try a few things
-    else:            
-        for i in rotationList:
-            img2 = img.rotate((i),resample=Image.NEAREST,expand = True)
-            bcData = decode(img2)
-            if len(bcData) != 0:
-                checkPattern(inputImgFile, bcData, img)
-                break
+    try:
+        img = Image.open(inputImgFile)
+    except (FileNotFoundError, OSError, WindowsError) as e:
+        noticeBox('{}'.format(e))
+        return
 
-        # Looks like it failed to find barcode value, gotta ask the user.
+    bcData = decode(img)  # get the barcode data
+    if len(bcData) == 0:
+        for i in rotationList:
+            img2 = img.rotate((i), resample=Image.NEAREST, expand=True)
+            bcData = decode(img2)
+            if len(bcData) > 0:
+                bcValue = checkPattern(bcData, img)
+                handleResult(inputImgFile, bcValue, img)
+                break
+        # Give up on rotation, and just ask the user.
         userInput = askBarcodeDialog('No Barcode Found.\n\nEnter the Desired File Name(without the extension):')
         handleResult(inputImgFile, userInput, img)
+    else:
+        bcValue = checkPattern(bcData, img)
+        handleResult(inputImgFile, bcValue, img)
 
 
-def checkPattern(inputImgFile,bcData, img):
-    ''' checks the retrieved BC value with a known collection regex pattern '''
+def checkPattern(bcData, img):
+    ''' checks the retrieved BC value with a known collection regex pattern
+    if it finds  a non-matching Barcode, it assumes the alignment is correct
+    but tries from the opposite end of the sheet. Incase of multiple BCs'''
 
-    bcValue = str(bcData[0].data).split("'")[1].rstrip("'") #clean up the Barcode                           
-    for collRegEx in collectionPatterns:
-        rePattern = re.compile(collRegEx) #match read BC to regex pattern (is this YOUR Barcode?)
-        if rePattern.match(bcValue):
-            handleResult(inputImgFile,bcValue,img)
-            return
-
-#In case there are multiple BCs, flip the image, and rescan for BC from other end.
-#Then essentially restart the function. (Probably a nicer way to do this)
-
-    img2 = img.rotate((180),resample=Image.NEAREST,expand = True)
-    bcData = decode(img2)
-    bcValue = str(bcData[0].data).split("'")[1].rstrip("'")
-    for collRegEx in collectionPatterns:
-        rePattern = re.compile(collRegEx )
-        if rePattern.match(bcValue):
-            handleResult(inputImgFile, bcValue, img)
-            return
-  
+    for i in range(2):
+        bcValue = str(bcData[0].data).split("'")[1].rstrip("'")  # clean up the Barcode
+        for collRegEx in collectionPatterns:
+            rePattern = re.compile(collRegEx)  # match BC to regex patterns
+            if rePattern.match(bcValue):
+                return bcValue
+        # If we have a bc which does not match, rotate it 180deg and try again
+        # as it may have multiple bcs, so start from other end.
+        img = img.rotate((180), resample=Image.NEAREST, expand=True)
+        bcData = decode(img)
+    #  if none of that matched the barcode ask the user:
     userInput = askBarcodeDialog('Barcode Does Not Match Any Known Catalog Code Patterns.\n\nEnter the Catalog Number:', bcValue)
-    handleResult(inputImgFile, userInput, img)
+    return userInput
+
+
+def handleResult(inputImgFile, bcValue, img):
+    ''' renames the input files appropriately '''
+    try:
+        oldRawName = inputImgFile.rsplit('.', 1)[0] + rawFileExt
+        inputBaseName = os.path.basename(inputImgFile)
+        newRawBaseName = bcValue + rawFileExt
+        newRawName = inputImgFile.replace(inputBaseName, newRawBaseName)
+        # check if the file name already exists there...
+        import glob
+        imDir = os.path.dirname(inputImgFile)
+        fileQty = len(glob.glob('{}/{}*{}'.format(imDir, bcValue, rawFileExt)))
+        if fileQty > 0:
+            import string
+            # generate a number to alphabet lookup string
+            alphaLookup = {n+1: ch for n, ch in enumerate(string.ascii_lowercase)}
+            # add the lower letter to the bcValue
+            initialValue = None
+            while initialValue is None:
+                initialValue = bcValue + alphaLookup.get(fileQty,'_{}'.format(str(fileQty)))
+                initialValue = askBarcodeDialog('{} Already Exists.\n\nEnter the Desired File Name (without the extension):'.format(bcValue), initialValue)
+            else:
+                bcValue = initialValue
+            newRawBaseName = bcValue + rawFileExt
+            newRawName = inputImgFile.replace(inputBaseName, newRawBaseName)
+
+        if oldRawName != newRawName:
+            try:
+                os.rename(oldRawName, newRawName)
+            # I'm not sure this exception can ever happen considering the file checking that happens in advance.
+            except WindowsError:
+                userInput = askBarcodeDialog('Enter the Catalog Number',
+                                             bcValue + 'a')
+                try:
+                    os.rename(oldRawName, userInput + rawFileExt)
+                except WindowsError as e:
+                    noticeBox('"{}" renaming "{}"'.format(e, inputImgFile))
+            print('Modified File Name!')
+    except FileNotFoundError as e:  # Looks like the expected file is missing
+        noticeBox('{}'.format(e))
+        return
+
+    if removeInputFile:
+        os.remove(inputImgFile)
 
 
 def noticeBox(errMsg):
@@ -106,7 +154,7 @@ def noticeBox(errMsg):
     root.mainloop()  # Initiate the GUI loop
 
 
-def askBarcodeDialog(queryText, initialValue = ''):
+def askBarcodeDialog(queryText, initialValue=''):
     '''When a barcode cannot be read, offer the user an entry box
     This can be integrated with a HID barcode scanner, those which
     automatically add a carriage return after the scan would perform very well
@@ -117,13 +165,12 @@ def askBarcodeDialog(queryText, initialValue = ''):
 
     root = tk.Tk()
     root.withdraw()  # hide the main window (it'll be empty)
-#   root.geometry("580x400+300+200")
-    root.title("Pah Tum")
+    root.title('bcAudit')
     # The barcode entry popup box.
-    
     bc_entry_box = None
-    while bc_entry_box == None:
-        bc_entry_box = simpledialog.askstring("BCAudit", queryText, parent=root, 
+    while bc_entry_box is None:
+        bc_entry_box = simpledialog.askstring("BCAudit", queryText,
+                                              parent=root,
                                               initialvalue=initialValue)
     # if the bc_entry_box has results then use them
     if bc_entry_box:
@@ -134,54 +181,8 @@ def askBarcodeDialog(queryText, initialValue = ''):
             userEntry = None
         root.destroy()  # kill the GUI, before we exit the function.
         return userEntry  # return the result
-
     root.mainloop()  # Initiate the GUI loop
 
 
-def handleResult(inputImgFile, bcValue, img):
-    ''' renames the resulting files appropriately '''
-    
-    try:
-        oldRawName = inputImgFile.rsplit('.',1)[0] + rawFileExt
-        inputBaseName = os.path.basename(inputImgFile)
-        newRawBaseName = bcValue + rawFileExt
-        newRawName = inputImgFile.replace(inputBaseName, newRawBaseName)
-        # check if the file name already exists there...
-        import glob
-        imDir = os.path.dirname(inputImgFile)
-        print('{}//{}*{}'.format(imDir, bcValue, rawFileExt))
-        fileQty = len(glob.glob('{}/{}*{}'.format(imDir, bcValue, rawFileExt)))
-        if fileQty > 0:
-            import string
-            # generate a number to alphabet lookup string
-            alphaLookup = {n+1:ch for n, ch in enumerate(string.ascii_lowercase)}
-            # add the lower letter to the bcValue
-            initialValue = None
-            while initialValue == None:
-                initialValue = bcValue + alphaLookup.get(fileQty, '_{}'.format(str(fileQty)))
-                initialValue = askBarcodeDialog('{} Already Exists.\n\nEnter the Desired File Name (without the extension):'.format(bcValue), initialValue)
-            else:
-                bcValue = initialValue
-            newRawBaseName = bcValue + rawFileExt
-            newRawName = inputImgFile.replace(inputBaseName, newRawBaseName)
-
-        if oldRawName != newRawName:
-            try:
-                os.rename(oldRawName, newRawName)
-            # I'm not sure this exception can ever happen considering the file checking that happens in advance.
-            except WindowsError:
-                userInput = askBarcodeDialog('Enter the Catalog Number', bcValue + 'a')
-                try:
-                    os.rename(oldRawName, userInput + rawFileExt)
-                except WindowsError as e:
-                    noticeBox('"{}" renaming "{}"'.format(e, inputImgFile))
-            print('Modified File Name!')
-    except FileNotFoundError as e:  #Looks like the expected file is missing    
-        noticeBox('"{}" not found'.format(inputImgFile))
-        print(e)
-    
-    if removeInputFile:
-        os.remove(inputImgFile)            
-     
 if __name__ == '__main__':
     main()
