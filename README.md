@@ -37,7 +37,7 @@
 
 -If the patterns match, name corrections are made silently.
 
--If there is an error finding or reading the barcode (multi-sheet specimen) or an error finding the files then the program attempts to initiate a classic "Beep" to warn the user of an error.
+-If there is an error finding or reading the barcode (multi-sheet specimen) or an error finding the files then a dialogue box will prompt the user for input. This should accept HID barcode scanner input.
 
 -Initially distributed as a single .exe window file using pyinstaller.
 
