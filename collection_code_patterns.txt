@@ -1,0 +1,21 @@
+#
+# simple list of regex patterns to match your collection(s) barcode formats.
+# Each regex pattern should be on a new line.
+# 
+# eg: ^(UCHT\d{6})\D* matches UCHT123456
+# eg: ^(TENN-V-\d{7})\D* matches TENN-V-1234567
+#
+# for help with this code: you can E-mail CalebAdamPowell@gmail.com
+# include in the message one example image, with a barcode from your collection
+#
+^(UCHT\d{6})\D*
+^(TENN-V-\d{7})\D*
+^(APSC\d{7})\D*
+^(HTTU\d{6})\D*
+^(ETSU\d{6})\D*
+^(MTSU\d{6})\D*
+^(SWMT\d{5})\D*
+^(UTM\d{5})\D*
+^(UOS\d{5})\D*
+^(MEM\d{6})\D*
+^(GSMNP\d{6})\D*
