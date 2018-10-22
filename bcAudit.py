@@ -118,7 +118,11 @@ def handleResult(inputImgFile, bcValue, img):
             initialValue = None
             while initialValue is None:
                 initialValue = bcValue + alphaLookup.get(fileQty,'_{}'.format(str(fileQty)))
-                initialValue = askBarcodeDialog('{} Already Exists.\n\nEnter the Desired File Name (without the extension):'.format(bcValue), initialValue)
+                initialValue = askBarcodeDialog('{} Already Exists.\n\nEnter the Desired File Name (without the extension):'.format(bcValue), initialValue)              
+                # address when the user proposes (again) a file name which already exists (still?)
+                proposedValue = os.path.exists(initialValue + rawFileExt)
+                if proposedValue:
+                    initialValue = None
             else:
                 bcValue = initialValue
             newRawBaseName = bcValue + rawFileExt
