@@ -9,22 +9,23 @@ inputImgFile = ''
 barCodeType = 'CODE128'
 
 # read the collection code pattern(s)
-with open('collection_code_patterns.txt', 'r') as file: 
-    lines = file.read().split('\n')
-    collectionPatterns = [x for x in lines if not any([x.strip().startswith('#'), x == ''])]
-    #comment_less = filter(None, (line.split('#')[0].strip() for line in lines))    
-
-#collectionPatterns = [(r'^(UCHT\d{6})\D*'),
-#                      (r'^(TENN-V-\d{7})\D*'),
-#                      (r'^(APSC\d{7})\D*'),
-#                      (r'^(HTTU\d{6})\D*'),
-#                      (r'^(ETSU\d{6})\D*'),
-#                      (r'^(MTSU\d{6})\D*'),
-#                      (r'^(SWMT\d{5})\D*'),
-#                      (r'^(UTM\d{5})\D*'),
-#                      (r'^(UOS\d{5})\D*'),
-#                      (r'^(MEM\d{6})\D*'),
-#                      (r'^(GSMNP\d{6})\D*')]
+try:
+    with open('collection_code_patterns.txt', 'r') as file: 
+        lines = file.read().split('\n')
+        collectionPatterns = [x for x in lines if not any([x.strip().startswith('#'), x == ''])]
+        #comment_less = filter(None, (line.split('#')[0].strip() for line in lines))    
+except FileNotFoundError:
+    collectionPatterns = [(r'^(UCHT\d{6})\D*'),
+                      (r'^(TENN-V-\d{7})\D*'),
+                      (r'^(APSC\d{7})\D*'),
+                      (r'^(HTTU\d{6})\D*'),
+                      (r'^(ETSU\d{6})\D*'),
+                      (r'^(MTSU\d{6})\D*'),
+                      (r'^(SWMT\d{5})\D*'),
+                      (r'^(UTM\d{5})\D*'),
+                      (r'^(UOS\d{5})\D*'),
+                      (r'^(MEM\d{6})\D*'),
+                      (r'^(GSMNP\d{6})\D*')]
 
 rawFileExt = '.CR2'
 # do you want to remove the .jpg file when this is all done?
@@ -103,8 +104,12 @@ def handleResult(inputImgFile, bcValue, img):
         newRawName = inputImgFile.replace(inputBaseName, newRawBaseName)
         # check if the file name already exists there...
         import glob
+        
         imDir = os.path.dirname(inputImgFile)
-        fileQty = len(glob.glob('{}/{}*{}'.format(imDir, bcValue, rawFileExt)))
+        if imDir:
+            fileQty = len(glob.glob('{}/{}*{}'.format(imDir, bcValue, rawFileExt)))
+        else:
+            fileQty = len(glob.glob('{}*{}'.format(bcValue, rawFileExt)))
         if fileQty > 0:
             import string
             # generate a number to alphabet lookup string
