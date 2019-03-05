@@ -3,7 +3,6 @@ import argparse
 import sys
 import re
 from PIL import Image
-import tkinter as tk
 from pyzbar.pyzbar import decode
 
 inputImgFile = ''
@@ -16,17 +15,18 @@ try:
         collectionPatterns = [x for x in lines if not any([x.strip().startswith('#'), x == ''])]
         #comment_less = filter(None, (line.split('#')[0].strip() for line in lines))    
 except FileNotFoundError:
-    collectionPatterns = [(r'^(UCHT\d{6})\D*'),
-                      (r'^(TENN-V-\d{7})\D*'),
-                      (r'^(APSC\d{7})\D*'),
-                      (r'^(HTTU\d{6})\D*'),
-                      (r'^(ETSU\d{6})\D*'),
-                      (r'^(MTSU\d{6})\D*'),
-                      (r'^(SWMT\d{5})\D*'),
-                      (r'^(UTM\d{5})\D*'),
-                      (r'^(UOS\d{5})\D*'),
-                      (r'^(MEM\d{6})\D*'),
-                      (r'^(GSMNP\d{6})\D*')]
+#    collectionPatterns = [(r'^(UCHT\d{6})\D*'),
+#                      (r'^(TENN-V-\d{7})\D*'),
+#                      (r'^(APSC\d{7})\D*'),
+#                      (r'^(HTTU\d{6})\D*'),
+#                      (r'^(ETSU\d{6})\D*'),
+#                      (r'^(MTSU\d{6})\D*'),
+#                      (r'^(SWMT\d{5})\D*'),
+#                      (r'^(UTM\d{5})\D*'),
+#                      (r'^(UOS\d{5})\D*'),
+#                      (r'^(MEM\d{6})\D*'),
+#                      (r'^(GSMNP\d{6})\D*')]
+    collectionPatterns = [r'^(\d{7})\w{0,1}']
 
 rawFileExt = '.CR2'
 # do you want to remove the .jpg file when this is all done?
