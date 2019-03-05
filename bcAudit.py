@@ -3,6 +3,7 @@ import argparse
 import sys
 import re
 from PIL import Image
+import tkinter as tk
 from pyzbar.pyzbar import decode
 
 inputImgFile = ''
