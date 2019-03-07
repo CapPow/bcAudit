@@ -14,7 +14,8 @@ from PIL import Image
 from pyzbar.pyzbar import decode
 
 inputImgFile = ''
-barCodeType = 'CODE128'
+#barCodeType = 'CODE128'
+barCodeType = 'CODE39'
 
 # read the collection code pattern(s)
 try:
@@ -34,7 +35,8 @@ except FileNotFoundError:
 #                      (r'^(UOS\d{5})\D*'),
 #                      (r'^(MEM\d{6})\D*'),
 #                      (r'^(GSMNP\d{6})\D*')]
-    collectionPatterns = [r'^(\d{7})\w{0,1}']
+#    collectionPatterns = [r'^(\d{7})\w{0,1}']
+    collectionPatterns = [r'^(\d{7}) ?\w{0,1}']
 
 rawFileExt = '.CR2'
 # do you want to remove the .jpg file when this is all done?
@@ -79,6 +81,11 @@ def main(args=None):
         # Give up on rotation, and just ask the user.
         userInput = askBarcodeDialog('No Barcode Found.\n\nEnter the Desired File Name(without the extension):')
         handleResult(inputImgFile, userInput, img)
+    
+    elif len(bcData) > 1:
+        bestValue = [x for x in bcData if x.type == barCodeType]
+        bcValue = checkPattern(bestValue, img)
+        handleResult(inputImgFile, bcValue, img)
     else:
         bcValue = checkPattern(bcData, img)
         handleResult(inputImgFile, bcValue, img)

@@ -8,5 +8,5 @@
 # for help with this code: you can E-mail CalebAdamPowell@gmail.com
 # include in the message one example image, with a barcode from your collection
 #
-^(\d{7})\w{0,1}
+^(\d{7}) ?\w{0,1}
 
