@@ -1,3 +1,11 @@
+"""
+modified branch for UMITCH workflow
+
+This work is heavily reliant upon the pyzbar library, 
+As such, many thanks to their work! pyzbar souce is
+located at: https://github.com/NaturalHistoryMuseum/pyzbar
+    
+"""
 import os
 import argparse
 import sys
@@ -93,6 +101,10 @@ def checkPattern(bcData, img):
         bcData = decode(img)
     #  if none of that matched the barcode ask the user:
     userInput = askBarcodeDialog('Barcode Does Not Match Any Known Catalog Code Patterns.\n\nEnter the Catalog Number:', bcValue)
+    # if the user cancels the dialog box.
+    while userInput is None:
+         userInput = askBarcodeDialog('Barcode Does Not Match Any Known Catalog Code Patterns.\n\nYou must enter a Catalog Number:', bcValue)
+        
     return userInput
 
 
@@ -105,7 +117,7 @@ def handleResult(inputImgFile, bcValue, img):
         newRawName = inputImgFile.replace(inputBaseName, newRawBaseName)
         # check if the file name already exists there...
         import glob
-        
+
         imDir = os.path.dirname(inputImgFile)
         if imDir:
             fileQty = len(glob.glob('{}/{}*{}'.format(imDir, bcValue, rawFileExt)))
@@ -114,16 +126,21 @@ def handleResult(inputImgFile, bcValue, img):
         if fileQty > 0:
             import string
             # generate a number to alphabet lookup string
-            alphaLookup = {n+1: ch for n, ch in enumerate(string.ascii_lowercase)}
+            #alphaLookup = {n+1: ch for n, ch in enumerate(string.ascii_lowercase)}
+            alphaLookup = {n+1: ch for n, ch in enumerate(string.ascii_uppercase)}
             # add the lower letter to the bcValue
             initialValue = None
             while initialValue is None:
                 initialValue = bcValue + alphaLookup.get(fileQty,'_{}'.format(str(fileQty)))
+                while os.path.exists(initialValue + rawFileExt):
+                    fileQty += 1
+                    initialValue = bcValue + alphaLookup.get(fileQty,'_{}'.format(str(fileQty)))
                 initialValue = askBarcodeDialog('{} Already Exists.\n\nEnter the Desired File Name (without the extension):'.format(bcValue), initialValue)              
                 # address when the user proposes (again) a file name which already exists (still?)
-                proposedValue = os.path.exists(initialValue + rawFileExt)
-                if proposedValue:
-                    initialValue = None
+                if initialValue:
+                    proposedValue = os.path.exists(initialValue + rawFileExt)
+                    if proposedValue:
+                        initialValue = None
             else:
                 bcValue = initialValue
             newRawBaseName = bcValue + rawFileExt
@@ -177,21 +194,21 @@ def askBarcodeDialog(queryText, initialValue=''):
     root.withdraw()  # hide the main window (it'll be empty)
     root.title('bcAudit')
     # The barcode entry popup box.
-    bc_entry_box = None
-    while bc_entry_box is None:
-        bc_entry_box = simpledialog.askstring("BCAudit", queryText,
-                                              parent=root,
-                                              initialvalue=initialValue)
+    bc_entry_box = simpledialog.askstring("BCAudit", queryText,
+                                          parent=root,
+                                          initialvalue=initialValue)
     # if the bc_entry_box has results then use them
     if bc_entry_box:
         #   If they cancel it returns None
         userEntry = bc_entry_box
         #  If they enter nothing, chang the empty string into None
-        if userEntry == '':
-            userEntry = None
-        root.destroy()  # kill the GUI, before we exit the function.
-        return userEntry  # return the result
-    root.mainloop()  # Initiate the GUI loop
+    else:
+        userEntry = None
+    if userEntry == '':
+        userEntry = None
+    root.destroy()  # kill the GUI, before we exit the function.
+    return userEntry  # return the result
+    #root.mainloop()  # Initiate the GUI loop
 
 
 if __name__ == '__main__':
