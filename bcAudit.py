@@ -81,7 +81,7 @@ def main(args=None):
         # Give up on rotation, and just ask the user.
         userInput = askBarcodeDialog('No Barcode Found.\n\nEnter the Desired File Name(without the extension):')
         handleResult(inputImgFile, userInput, img)
-    
+
     elif len(bcData) > 1:
         bestValue = [x for x in bcData if x.type == barCodeType]
         bcValue = checkPattern(bestValue, img)
@@ -171,6 +171,8 @@ def handleResult(inputImgFile, bcValue, img):
 
     if removeInputFile:
         os.remove(inputImgFile)
+    else:  # if we're keeping the jpg files, rename them with the CR2.
+        os.rename(oldRawName.replace('.CR2','.jpg'), newRawName.replace('.CR2','.jpg'))
 
 
 def noticeBox(errMsg):
