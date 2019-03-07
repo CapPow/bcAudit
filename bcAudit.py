@@ -1,20 +1,19 @@
 """
 This work is heavily reliant upon the pyzbar library, 
 As such, many thanks to their work! pyzbar souce is
-located at: https://github.com/NaturalHistoryMuseum/pyzbar  
+located at: https://github.com/NaturalHistoryMuseum/pyzbar
+    
 """
-
-
 import os
 import argparse
 import sys
 import re
 from PIL import Image
-import tkinter as tk
 from pyzbar.pyzbar import decode
 
 inputImgFile = ''
 barCodeType = 'CODE128'
+#barCodeType = 'CODE39'
 
 # read the collection code pattern(s)
 try:
@@ -24,16 +23,17 @@ try:
         #comment_less = filter(None, (line.split('#')[0].strip() for line in lines))    
 except FileNotFoundError:
     collectionPatterns = [(r'^(UCHT\d{6})\D*'),
-                      (r'^(TENN-V-\d{7})\D*'),
-                      (r'^(APSC\d{7})\D*'),
-                      (r'^(HTTU\d{6})\D*'),
-                      (r'^(ETSU\d{6})\D*'),
-                      (r'^(MTSU\d{6})\D*'),
-                      (r'^(SWMT\d{5})\D*'),
-                      (r'^(UTM\d{5})\D*'),
-                      (r'^(UOS\d{5})\D*'),
-                      (r'^(MEM\d{6})\D*'),
-                      (r'^(GSMNP\d{6})\D*')]
+                          (r'^(TENN-V-\d{7})\D*'),
+                          (r'^(APSC\d{7})\D*'),
+                          (r'^(HTTU\d{6})\D*'),
+                          (r'^(ETSU\d{6})\D*'),
+                          (r'^(MTSU\d{6})\D*'),
+                          (r'^(SWMT\d{5})\D*'),
+                          (r'^(UTM\d{5})\D*'),
+                          (r'^(UOS\d{5})\D*'),
+                          (r'^(MEM\d{6})\D*'),
+                          (r'^(GSMNP\d{6})\D*')]
+#    collectionPatterns = [r'^(\d{7}) ?\w{0,1}']
 
 rawFileExt = '.CR2'
 # do you want to remove the .jpg file when this is all done?
@@ -41,7 +41,6 @@ rawFileExt = '.CR2'
 removeInputFile = True
 
 rotationList = [12, -12,  21, -21]
-
 
 # set up WindowsError if it is appropriate
 try:
@@ -78,6 +77,11 @@ def main(args=None):
         # Give up on rotation, and just ask the user.
         userInput = askBarcodeDialog('No Barcode Found.\n\nEnter the Desired File Name(without the extension):')
         handleResult(inputImgFile, userInput, img)
+
+    elif len(bcData) > 1:
+        bestValue = [x for x in bcData if x.type == barCodeType]
+        bcValue = checkPattern(bestValue, img)
+        handleResult(inputImgFile, bcValue, img)
     else:
         bcValue = checkPattern(bcData, img)
         handleResult(inputImgFile, bcValue, img)
@@ -100,6 +104,10 @@ def checkPattern(bcData, img):
         bcData = decode(img)
     #  if none of that matched the barcode ask the user:
     userInput = askBarcodeDialog('Barcode Does Not Match Any Known Catalog Code Patterns.\n\nEnter the Catalog Number:', bcValue)
+    # if the user cancels the dialog box.
+    while userInput is None:
+         userInput = askBarcodeDialog('Barcode Does Not Match Any Known Catalog Code Patterns.\n\nYou must enter a Catalog Number:', bcValue)
+        
     return userInput
 
 
@@ -112,7 +120,7 @@ def handleResult(inputImgFile, bcValue, img):
         newRawName = inputImgFile.replace(inputBaseName, newRawBaseName)
         # check if the file name already exists there...
         import glob
-        
+
         imDir = os.path.dirname(inputImgFile)
         if imDir:
             fileQty = len(glob.glob('{}/{}*{}'.format(imDir, bcValue, rawFileExt)))
@@ -121,16 +129,21 @@ def handleResult(inputImgFile, bcValue, img):
         if fileQty > 0:
             import string
             # generate a number to alphabet lookup string
+            #alphaLookup = {n+1: ch for n, ch in enumerate(string.ascii_uppercase)}
             alphaLookup = {n+1: ch for n, ch in enumerate(string.ascii_lowercase)}
             # add the lower letter to the bcValue
             initialValue = None
             while initialValue is None:
                 initialValue = bcValue + alphaLookup.get(fileQty,'_{}'.format(str(fileQty)))
+                while os.path.exists(initialValue + rawFileExt):
+                    fileQty += 1
+                    initialValue = bcValue + alphaLookup.get(fileQty,'_{}'.format(str(fileQty)))
                 initialValue = askBarcodeDialog('{} Already Exists.\n\nEnter the Desired File Name (without the extension):'.format(bcValue), initialValue)              
                 # address when the user proposes (again) a file name which already exists (still?)
-                proposedValue = os.path.exists(initialValue + rawFileExt)
-                if proposedValue:
-                    initialValue = None
+                if initialValue:
+                    proposedValue = os.path.exists(initialValue + rawFileExt)
+                    if proposedValue:
+                        initialValue = None
             else:
                 bcValue = initialValue
             newRawBaseName = bcValue + rawFileExt
@@ -154,6 +167,9 @@ def handleResult(inputImgFile, bcValue, img):
 
     if removeInputFile:
         os.remove(inputImgFile)
+    else:  # if we're keeping the jpg files, rename them with the CR2.
+        os.rename(oldRawName.replace('.CR2', '.jpg'),
+                  newRawName.replace('.CR2', '.jpg'))
 
 
 def noticeBox(errMsg):
@@ -184,22 +200,20 @@ def askBarcodeDialog(queryText, initialValue=''):
     root.withdraw()  # hide the main window (it'll be empty)
     root.title('bcAudit')
     # The barcode entry popup box.
-    bc_entry_box = None
-    while bc_entry_box is None:
-        bc_entry_box = simpledialog.askstring("BCAudit", queryText,
-                                              parent=root,
-                                              initialvalue=initialValue)
+    bc_entry_box = simpledialog.askstring("BCAudit", queryText,
+                                          parent=root,
+                                          initialvalue=initialValue)
     # if the bc_entry_box has results then use them
     if bc_entry_box:
         #   If they cancel it returns None
         userEntry = bc_entry_box
         #  If they enter nothing, chang the empty string into None
-        if userEntry == '':
-            userEntry = None
-        root.destroy()  # kill the GUI, before we exit the function.
-        return userEntry  # return the result
-    root.mainloop()  # Initiate the GUI loop
-
-
+    else:
+        userEntry = None
+    if userEntry == '':
+        userEntry = None
+    root.destroy()  # kill the GUI, before we exit the function.
+    return userEntry  # return the result
+    #root.mainloop()  # Initiate the GUI loop
 if __name__ == '__main__':
     main()
