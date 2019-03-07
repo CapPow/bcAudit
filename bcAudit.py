@@ -1,3 +1,10 @@
+"""
+This work is heavily reliant upon the pyzbar library, 
+As such, many thanks to their work! pyzbar souce is
+located at: https://github.com/NaturalHistoryMuseum/pyzbar  
+"""
+
+
 import os
 import argparse
 import sys
