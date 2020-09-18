@@ -3,7 +3,7 @@
 
 ### Thanks to [Natural History Museum](https://github.com/NaturalHistoryMuseum) for their work on [pyzbar](https://github.com/NaturalHistoryMuseum/pyzbar)!
 
-#### This is a test project, Use at your own risk!
+A more robust solution to automating post-imaging steps associated with natural history digitization, including barcode-to-file renaming is now being developed in a [seperate repository](https://github.com/CapPow/HerbASAP)
 
 ### Quick Setup
 
